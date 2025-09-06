@@ -3,3 +3,5 @@
 
 🎮 Personal Project | ⚠️ Do Not Fork  
 This repo is just for my own fun and learning. Thanks for understanding!
+
+![hoshino](https://count.getloli.com/@hoshino?theme=booru-lewd)
