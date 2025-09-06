@@ -2,6 +2,7 @@ Welcome
 
 你可能感兴趣的
 *   [七夕抽奖](https://hoshinoholic.github.io/html/qixichoujiang/index.html)
+*   [V我50](https://hoshinoholic.github.io/html/vMe50/index.html)
 
 
 
