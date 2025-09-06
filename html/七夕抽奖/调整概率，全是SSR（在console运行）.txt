@@ -1,0 +1,22 @@
+// 最简强制SSR方案
+drawSingleTime = function() {
+    drawCount++;
+    document.getElementById('drawCount').textContent = `已抽奖次数: ${drawCount}`;
+    
+    // 创建弹幕
+    const danmaku = document.createElement('div');
+    danmaku.className = 'danmaku red-label';
+    danmaku.textContent = '好呀宝宝 (SSR)';
+    danmaku.style.top = `${Math.random() * (window.innerHeight - 50)}px`;
+    danmaku.style.animationDuration = `${5 + Math.random() * 10}s`;
+    document.getElementById('danmakuContainer').appendChild(danmaku);
+    
+    // 显示结果
+    const result = document.createElement('div');
+    result.className = 'result-item';
+    result.innerHTML = '<span class="prize-name-ssr">好呀宝宝</span> <span class="red-label">(SSR)</span>';
+    document.getElementById('resultsContainer').appendChild(result);
+    
+    // 自动移除弹幕
+    setTimeout(() => danmaku.remove(), parseFloat(danmaku.style.animationDuration) * 1000);
+};

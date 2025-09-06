@@ -1,0 +1,288 @@
+const prizes = [
+    { name: "滚你妈的", probability: 0.1 },
+    { name: "去你妈的", probability: 0.1 },
+    { name: "你也配？", probability: 0.1 },
+    { name: "傻逼二次元", probability: 0.1 },
+    { name: "癔症又犯了？", probability: 0.1 },
+    { name: "死变态真恶心", probability: 0.05 },
+    { name: "现在是幻想时刻", probability: 0.05 },
+    { name: "柚子厨滚出去", probability: 0.05 },
+    { name: "这是最后通牒", probability: 0.05 },
+    { name: "以后不要再和我扯上关系", probability: 0.05 },
+    { name: "被拉黑+屏蔽", probability: 0.05 },
+    { name: "哼！不理你了", probability: 0.05 },
+    { name: "随机的白丝", probability: 0.025 },
+    { name: "随机的黑丝", probability: 0.025 },
+    { name: "我一直把你当好朋友", probability: 0.025 },
+    { name: "我喜欢你但是我们的关系还没有到这一步", probability: 0.025 },
+    { name: "果体小视频", probability: 0.0125 },
+    { name: "对不起，我感觉我们不能这样", probability: 0.03 },
+    { name: "好呀宝宝", probability: 0, ssr: true } // 初始概率为0
+];
+
+let drawCount = 0;
+const guaranteedDrawCount = 100000000000000; // 保底次数
+
+// 显示奖励弹窗
+function showModal(prizeName, rarity) {
+    const modal = document.getElementById('rewardModal');
+    const modalPrize = document.getElementById('modalPrize');
+    
+    // 设置弹窗内奖品名称和样式
+    let className = '';
+    if (rarity === 'SSR') {
+        className = 'prize-name-ssr';
+    } else if (rarity === 'SR+') {
+        className = 'prize-name-sr-plus';
+    }
+    
+    modalPrize.innerHTML = `<span class="${className}">${prizeName} (${rarity})</span>`;
+    modal.style.display = 'flex';
+}
+
+// 关闭弹窗
+function closeModal() {
+    const modal = document.getElementById('rewardModal');
+    modal.style.display = 'none';
+}
+
+// 弹幕相关函数
+function createDanmaku(text, colorClass) {
+    const danmakuContainer = document.getElementById('danmakuContainer');
+    const danmaku = document.createElement('div');
+    danmaku.className = `danmaku ${colorClass}`;
+    danmaku.textContent = text;
+    
+    // 随机位置（垂直方向）
+    const top = Math.random() * (window.innerHeight - 50);
+    danmaku.style.top = `${top}px`;
+    
+    // 随机动画时长（5-15秒）
+    const duration = 5 + Math.random() * 10;
+    danmaku.style.animationDuration = `${duration}s`;
+    
+    danmakuContainer.appendChild(danmaku);
+    
+    // 动画结束后移除弹幕元素
+    setTimeout(() => {
+        danmaku.remove();
+    }, duration * 1000);
+}
+
+function adjustProbabilities() {
+    let totalProbability = 0;
+    for (let i = 0; i < prizes.length - 1; i++) {
+        totalProbability += prizes[i].probability;
+    }
+
+    // 设置“好呀宝宝”的概率为剩余的概率减去一个极小值
+    const ssrProbability = 1e-18;
+    prizes[prizes.length - 1].probability = Math.max(0, 1 - totalProbability - ssrProbability);
+
+    // 如果计算出的概率小于0，则将其设为极小值
+    if (prizes[prizes.length - 1].probability < 0) {
+        prizes[prizes.length - 1].probability = ssrProbability;
+    } else {
+        prizes[prizes.length - 1].probability += ssrProbability;
+    }
+}
+
+function updatePrizeList() {
+    const prizeListElement = document.getElementById('prizeList');
+    prizeListElement.innerHTML = '';
+    prizes.forEach((prize, index) => {
+        const div = document.createElement('div');
+        div.className = 'prize-card';
+        
+        let rarityClass = '';
+        let rarityText = '';
+        
+        if (prize.ssr) {
+            rarityClass = 'ssr';
+            rarityText = 'SSR';
+        } else if (prize.probability >= 0.1) {
+            rarityClass = 'n';
+            rarityText = 'N';
+        } else if (prize.probability >= 0.05) {
+            rarityClass = 'r';
+            rarityText = 'R';
+        } else if (prize.probability >= 0.025) {
+            rarityClass = 'sr';
+            rarityText = 'SR';
+        } else if (prize.probability >= 0.0125) {
+            rarityClass = 'sr-plus';
+            rarityText = 'SR+';
+        }
+        
+        div.className = `prize-card ${rarityClass}`;
+        
+        div.innerHTML = `
+            <div class="prize-name">
+                <span>${prize.name}</span>
+                <span class="prize-rarity">${rarityText}</span>
+            </div>
+            <div class="prize-probability">概率: ${(prize.probability * 100).toFixed(2)}%</div>
+        `;
+
+        prizeListElement.appendChild(div);
+    });
+}
+
+function getLabel(prize) {
+    if (prize.ssr) return '(SSR)';
+    if (prize.probability >= 0.1) return '(N)';
+    if (prize.probability >= 0.05) return '(R)';
+    if (prize.probability >= 0.025) return '(SR)';
+    if (prize.probability >= 0.0125) return '(SR+)';
+    return '';
+}
+
+function getColor(label) {
+    switch (label) {
+        case '(SSR)': return 'red-label';
+        case '(N)': return 'gray-label';
+        case '(R)': return 'light-blue-label';
+        case '(SR)': return 'mediumpurple-label';
+        case '(SR+)': return 'gold-label';
+        default: return '';
+    }
+}
+
+function getNameColor(label) {
+    switch (label) {
+        case '(SSR)': return 'prize-name-ssr';
+        case '(N)': return 'prize-name-n';
+        case '(R)': return 'prize-name-r';
+        case '(SR)': return 'prize-name-sr';
+        case '(SR+)': return 'prize-name-sr-plus';
+        default: return '';
+    }
+}
+
+function draw() {
+    drawSingleTime();
+}
+
+function drawSingleTime() {
+    drawCount++;
+    document.getElementById('drawCount').textContent = `已抽奖次数: ${drawCount}`;
+
+    const randomValue = Math.random();
+    let cumulativeProbability = 0;
+    let finalPrize = null;
+    let finalLabel = '';
+    let finalColorClass = '';
+    let finalNameColorClass = '';
+    let displayText = '';
+
+    for (let i = 0; i < prizes.length; i++) {
+        cumulativeProbability += prizes[i].probability;
+        if (randomValue <= cumulativeProbability) {
+            let prizeToDisplay = prizes[i];
+
+            // 处理特殊奖品替换逻辑
+            if ((prizeToDisplay.name === "随机的白丝" || prizeToDisplay.name === "随机的黑丝") && drawCount < 100) {
+                prizeToDisplay = { name: ["我一直把你当好朋友", "我喜欢你但是我们的关系还没有到这一步", "对不起，我感觉我们不能这样"][Math.floor(Math.random() * 3)], probability: 0.025 };
+            } else if (prizeToDisplay.name === "果体小视频" && drawCount < 200) {
+                prizeToDisplay = { name: ["我一直把你当好朋友", "我喜欢你但是我们的关系还没有到这一步", "对不起，我感觉我们不能这样"][Math.floor(Math.random() * 3)], probability: 0.025 };
+            }
+
+            // 处理SSR保底逻辑
+            if (prizeToDisplay.name === "好呀宝宝") {
+                if (drawCount >= guaranteedDrawCount) {
+                    finalPrize = prizeToDisplay;
+                } else {
+                    // 替换为其他奖励
+                    const otherPrizes = prizes.filter(prize => prize.name !== "好呀宝宝");
+                    const newRandomValue = Math.random();
+                    let newCumulativeProbability = 0;
+
+                    for (let j = 0; j < otherPrizes.length; j++) {
+                        newCumulativeProbability += otherPrizes[j].probability;
+                        if (newRandomValue <= newCumulativeProbability) {
+                            finalPrize = otherPrizes[j];
+                            break;
+                        }
+                    }
+                }
+            } else {
+                finalPrize = prizeToDisplay;
+            }
+
+            // 计算最终奖品的显示信息（确保与实际奖品一致）
+            finalLabel = getLabel(finalPrize);
+            finalColorClass = getColor(finalLabel);
+            finalNameColorClass = getNameColor(finalLabel);
+            displayText = `${finalPrize.name} ${finalLabel}`;
+            
+            // 创建与最终奖品对应的弹幕
+            createDanmaku(displayText, finalColorClass);
+            
+            // 添加结果到显示区域
+            addResult(`<span class="${finalNameColorClass}">${finalPrize.name}</span> <span class="${finalColorClass}">${finalLabel}</span>`);
+            
+            // 如果抽到SR+或SSR，显示弹窗
+            if (finalLabel === '(SR+)' || finalLabel === '(SSR)') {
+                const rarity = finalLabel.replace(/[()]/g, '');
+                showModal(finalPrize.name, rarity);
+            }
+            
+            // 重置保底计数
+            if (finalPrize.name === "好呀宝宝") {
+                drawCount = 0;
+            }
+            
+            return;
+        }
+    }
+}
+
+function drawTenTimes() {
+    const resultsContainer = document.getElementById('resultsContainer');
+    const resultRow = document.createElement('div');
+    resultRow.className = 'result-row';
+
+    // 保存当前容器中的子元素数量，用于后续获取新添加的元素
+    const initialChildCount = resultsContainer.children.length;
+
+    for (let i = 0; i < 10; i++) {
+        drawSingleTime();
+    }
+
+    // 将新添加的10个结果移到一个行容器中
+    const newChildren = Array.from(resultsContainer.children).slice(initialChildCount);
+    newChildren.forEach(child => {
+        resultRow.appendChild(child);
+    });
+
+    resultsContainer.appendChild(resultRow);
+}
+
+function addResult(resultText) {
+    const resultsContainer = document.getElementById('resultsContainer');
+    const resultItem = document.createElement('div');
+    resultItem.className = 'result-item';
+    resultItem.innerHTML = resultText;
+    resultsContainer.appendChild(resultItem);
+    
+    // 自动滚动到底部
+    resultsContainer.scrollTop = resultsContainer.scrollHeight;
+}
+
+// 重置抽奖功能
+function resetDraw() {
+    // 清空结果容器
+    document.getElementById('resultsContainer').innerHTML = '';
+    // 重置抽奖次数
+    drawCount = 0;
+    document.getElementById('drawCount').textContent = `已抽奖次数: ${drawCount}`;
+    // 关闭可能打开的弹窗
+    closeModal();
+}
+
+// 调整概率以确保总和为1
+adjustProbabilities();
+
+// 初始化奖品列表
+updatePrizeList();
+    
