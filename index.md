@@ -8,3 +8,4 @@ Welcome
 
 本页仅供海外华人访问其它访问责任自负。
 
+<img src="https://count.getloli.com/@ceceliaLapo18?theme=booru-lewd" alt=":name" />
