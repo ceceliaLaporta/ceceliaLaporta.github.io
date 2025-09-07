@@ -1,7 +1,7 @@
-# hoshinoholic.github.io
+# ceceliaLaporta.github.io
 本仓库仅为个人娱乐，请勿fork
 
 🎮 Personal Project | ⚠️ Do Not Fork  
 This repo is just for my own fun and learning. Thanks for understanding!
 
-![hoshino](https://count.getloli.com/@hoshino?theme=booru-lewd)
+![ceceliaLapo18](https://count.getloli.com/@ceceliaLapo18?theme=booru-lewd)
